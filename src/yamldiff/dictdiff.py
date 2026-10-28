@@ -11,6 +11,7 @@ Created on Thu Dec 24 18:19:07 2015
 import sys
 from collections import namedtuple, OrderedDict
 import contextlib
+import math
 import argparse
 import pickle
 
@@ -51,6 +52,12 @@ def val_diff(v1,v2):
         return set_diff(v1, v2)
     return (v1, v2)
 
+def is_float_nan(n):
+    return isinstance(n, float) and math.isnan(n)
+
+def is_ne(a, b):
+    return a != b and not (is_float_nan(a) and is_float_nan(b))
+
 def dict_diff(dict1, dict2):
 
     #Keep ordering if we have it
@@ -72,7 +79,7 @@ def dict_diff(dict1, dict2):
         same_keys = dict1.keys() & dict2.keys()
     different_vals = type(dict1)((k, val_diff(dict1[k], dict2[k]))
                                  for k in same_keys
-                                 if dict1[k] != dict2[k])
+                                 if is_ne(dict1[k], dict2[k]))
     return Diff(first_only, second_only, different_vals)
 
 def set_diff(set1, set2):
